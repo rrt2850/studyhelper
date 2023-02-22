@@ -1,11 +1,14 @@
-import React, {useState, useRef} from 'react'
-//useRef allows us to access elements inside the html from outside?
-
-import {v4 as uuid} from 'uuid'
-
-
+import Sidebar from "./Components/Sidebar"
+import "./App.css"
 function App() {
-  return null
+  return (
+    <>
+      <div className="App">
+        <Sidebar/>
+      </div>
+    </>
+    
+  );
 }
 
 export default App;
