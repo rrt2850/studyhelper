@@ -1,32 +1,34 @@
-import React from 'react'
-import "../App.css"
-import {SidebarData} from "./SidebarData"
 
-function flip({val}){
-    val.checked = !val.checked
-}
-function Sidebar() {
+import React from "react";
+import { Sidebar, Menu, MenuItem, SubMenu} from 'react-pro-sidebar';
+
+
+import { FaGem, FaHeart } from 'react-icons/fa';
+
+import "../App.scss"
+
+
+
+
+
+
+function SidebarHolder() {
+
   return (
-    <>
-        <div className="Sidebar">
-            <ul className="SidebarList">
-                {SidebarData.map((val) => {
-                    return(
-                        <li className="row" key={val.title} onClick={flip({val})}>
-                            <div className="SB-Item-Checkholder">
-                                <label >
-                                    <input className="SB-Item-Check" type="checkbox" defaultChecked={val.checked} onChange={flip({val})}></input>  
-                                </label>
-                            </div>
-                            
-                            <div className="SB-Item-Title">{val.title}</div>
-                        </li>
-                    )
-                })}   
-            </ul>
-        </div>
-    </>
-  )
+    <div className="Sidebar-Holder">
+      <Sidebar>
+        <Menu iconShape="square">
+          <MenuItem icon={<FaGem />}>Dashboard</MenuItem>
+          <SubMenu title="Components" icon={<FaHeart />}>
+            <MenuItem>Component 1</MenuItem>
+            <MenuItem>Component 2</MenuItem>
+          </SubMenu>
+        </Menu>
+      </Sidebar>
+
+    </div>
+  );
 }
 
-export default Sidebar
+export default SidebarHolder
+

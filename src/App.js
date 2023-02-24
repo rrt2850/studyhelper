@@ -1,10 +1,15 @@
-import Sidebar from "./Components/Sidebar"
-import "./App.css"
+import Title from "./Components/Title";
+import Inputs from "./Components/Inputs";
+import BackgroundPlayer from "./Components/BackgroundPlayer";
+import "./App.scss"
+
 function App() {
   return (
     <>
       <div className="App">
-        <Sidebar/>
+        <Title />
+        <Inputs />
+        <BackgroundPlayer />
       </div>
     </>
     

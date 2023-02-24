@@ -1,0 +1,152 @@
+
+
+// Define the base theme
+$base-theme: (
+    background-color: #f0f0f0,
+    text-color: #333333,
+    primary-color: #007bff,
+    secondary-color: #6c757d
+);
+
+// Define the dark theme by extending the base theme
+$dark-theme: (
+    background-color: #333333,
+    text-color: #f0f0f0,
+    primary-color: #007bff,
+    secondary-color: #6c757d
+);
+
+// Define a function to apply a theme
+@mixin theme($theme) {
+    body {
+        margin:0;
+        background-color: map-get($theme, background-color);
+        color: map-get($theme, text-color);
+    }
+
+    .Sidebar {
+        background-color: map-get($theme, background-color);
+        color: map-get($theme, text-color);
+
+        .Menu {
+            .MenuItem {
+                &:hover {
+                    background-color: map-get($theme, secondary-color);
+                    color: map-get($theme, text-color);
+                }
+
+                &.active {
+                    background-color: map-get($theme, primary-color);
+                    color: map-get($theme, text-color);
+                }
+            }
+
+            .SubMenu {
+                label {
+                    color: map-get($theme, text-color);
+                }
+            }
+        }
+    }
+}
+
+// Apply the dark theme by default
+@include theme($dark-theme);
+
+// Apply the base theme when the body has a 'base' class
+body.base {
+    @include theme($base-theme);
+}
+
+.Sidebar-Holder {
+    display: 'flex';
+    float: right;
+    height: '100%';
+}
+
+.Title h1 {
+    margin: 0;
+    margin-top: 24px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 50pt;
+    text-align: center;
+}
+
+.Title h2 {
+    margin: 0;
+    margin-top: 24px;
+    margin-left: 25vw;
+    margin-right: 25vw;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20pt;
+    text-align: center;
+}
+
+.Title .fullscreen-msg {
+    margin: 0;
+    margin-top: 10px;
+    margin-left: 25vw;
+    margin-right: 25vw;
+    margin-bottom: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15pt;
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
+
+.Inputs{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.Inputs textarea{
+    margin-top:5px;
+    width:40%;
+    height:30vh;
+    vertical-align: top;
+    resize: none;
+    color:#333333 !important;
+
+    /* set the background color with alpha value to create a semi-transparent effect */
+    background-color: rgba(255, 255, 255, 0.5);
+    /* add the blur effect with the backdrop-filter property */
+    backdrop-filter: blur(15px);
+    /* remove the border to create a clean look */
+    border: none;
+    /* disable the resizing of the textarea */
+    resize: none;
+    
+}
+
+.Inputs .ButtonHolder{
+    margin-top: 24px;
+    width:50%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.Inputs .ButtonHolder button{
+    padding: 5px;
+    margin: 3px;
+    width: 25%;
+}
+
+.react-player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+}
+
+.show{
+    display: block;
+}
