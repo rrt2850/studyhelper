@@ -6,7 +6,7 @@ const Title = () => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'f') {
+      if (event.key === 'f' && event.target.tagName.toLowerCase() !== 'textarea') {
         toggleFullScreen();
       }
     };
