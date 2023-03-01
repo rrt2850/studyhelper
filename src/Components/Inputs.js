@@ -9,6 +9,7 @@ export class Inputs extends Component {
         };
         this.handleInput = this.handleInput.bind(this);
         this.handleButtonClick = this.handleButtonClick.bind(this);
+        this.handleStartButtonClick = this.handleStartButtonClick.bind(this);
     }
 
     handleInput(event) {
@@ -18,6 +19,10 @@ export class Inputs extends Component {
     handleButtonClick(event) {
         const buttonIndex = parseInt(event.target.value, 10);
         this.props.changePath(buttonIndex);
+    }
+
+    handleStartButtonClick() {
+        this.props.toRead(this.state.value);
     }
 
     render() {
@@ -39,7 +44,9 @@ export class Inputs extends Component {
                     <button type="button" value="7" onClick={this.handleButtonClick}>Gameplay Footage</button>
                     <button type="button" value="8" onClick={this.handleButtonClick}>Random ASMR</button>
                     <button type="button" value="9" onClick={this.handleButtonClick}>Surprise Me</button>
+                    <button type="button" onClick={this.handleStartButtonClick}>Start</button>
                 </div>
+
             </div>
         )
     }
