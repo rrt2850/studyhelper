@@ -9,6 +9,11 @@
 import React, { Component } from 'react';
 import ReactPlayer from 'react-player/youtube';
 
+
+/**
+ * Paths: an array containing the urls and start times for the videos to play
+ * it's formatted like [genre [[url, startTime], [url, startTime], ...]]
+ */
 const paths = [
     /*Subway Surfer*/[['https://www.youtube.com/watch?v=AmUQhXJGk-s', 0]],
     /*Kinetic Sand*/[['https://www.youtube.com/watch?v=etp46Aca_UM', 0], ['https://www.youtube.com/watch?v=3clqk2U3T9Y', 13], ['https://www.youtube.com/watch?v=IeOJm025RlE', 6], ['https://www.youtube.com/watch?v=8BYrvVeejzg', 9]],
@@ -23,17 +28,21 @@ const paths = [
 ];
 
 class BackgroundPlayer extends Component {
-    state = {
-        currentPathIndex: this.props.pathIndex,
-    };
 
+    // Checks to see if the path index has changed
     componentDidUpdate(prevProps) {
         if (prevProps.pathIndex !== this.props.pathIndex) {
             this.setState({ currentPathIndex: this.props.pathIndex });
         }
     }
 
+    /**
+    * getRandomPath - Helper function that returns a random path from an array of paths
+    * @param {array|string} path - an array of paths or a single path
+    * @return {string} - a randomly selected path
+    */
     getRandomPath = (path) => {
+        // if there are multiple paths, pick a random one from the array
         if (Array.isArray(path)) {
             return path[Math.floor(Math.random() * path.length)];
         }
@@ -41,8 +50,10 @@ class BackgroundPlayer extends Component {
     };
 
     render() {
-        const { currentPathIndex } = this.state;
-        const currentPath = this.getRandomPath(paths[currentPathIndex]);
+        // Get path index from props, pick a random path from the list at that index
+        // and then convert it into a usable format
+        const { pathIndex } = this.props;   
+        const currentPath = this.getRandomPath(paths[pathIndex]);
         const url = currentPath[0];
         const startTime = parseFloat(currentPath[1]);
 
@@ -58,7 +69,6 @@ class BackgroundPlayer extends Component {
                 height="100%"
                 onReady={() => {
                     console.log('Player is ready');
-                    // Add any additional logic to start playing video here
                 }}
                 config={{
                     youtube: {
@@ -76,8 +86,8 @@ class BackgroundPlayer extends Component {
                         },
                     },
                 }}
-                bufferingRetry
-                bufferingRetryDelay={5000}
+                bufferingretry
+                bufferingretrydelay={5000}
             />
         );
     }

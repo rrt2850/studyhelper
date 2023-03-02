@@ -1,38 +1,70 @@
-// Import the required libraries
-const fs = require('fs');
+/**
+ * TTS.js
+ * @author Robert Tetreault
+ * @summary Recieves text through a post command and converts it to speech
+ *          using the google cloud api
+ */
+
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const bodyParser = require('body-parser');
 const textToSpeech = require('@google-cloud/text-to-speech');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
+
 require('dotenv').config();
 
-// Instantiates a client
+const port = 5000;
 const client = new textToSpeech.TextToSpeechClient();
 
-// The text to synthesize
-const text = "let me see that thug shaker. That Rump Shaker. Let me see that ass, I know you got one. I bet you got a thug ass";
+/**
+ * @function synthesizeText: Takes text and converts it into speech
+ * @param {String} text: The text to synthesize
+ * @returns an array buffer containing the audio data
+ */
+async function synthesizeText(text) {
+    // Format the request json to send to the api
+    const request = {
+        input: { text: text },
+        voice: { languageCode: 'en-US', ssmlGender: 'MALE' },
+        audioConfig: { audioEncoding: 'MP3' },
+    };
 
-// Construct the request
-const request = {
-    input: { text: text },
-    // Select the language and SSML Voice Gender (optional)
-    voice: { languageCode: 'en-US', ssmlGender: 'MALE' },
-    // Select the type of audio encoding
-    audioConfig: { audioEncoding: 'MP3' },
-};
+    // Wait until the api finishes
+    const [response] = await client.synthesizeSpeech(request);
 
-// Performs the Text-to-Speech request
-client.synthesizeSpeech(request, (err, response) => {
-    if (err) {
-        console.error('Error:', err);
-        return;
+    // Return audio data
+    return response.audioContent;
+}
+
+/**
+ * POST endpoint to convert text to speech
+ * @param {Object} req - Request object
+ * @param {string} req.body.text - Text to be converted to speech
+ * @param {Object} res - Response object
+ * @returns {Promise<Object>} - Returns a Promise which resolves to the audio file as a Buffer
+ * @throws {Error} - Throws an error if the server encounters an issue while processing the request
+ */
+app.post('/text-to-speech', async (req, res) => {
+    try {
+        const text = req.body.text;
+        const audioContent = await synthesizeText(text);
+        console.log("text converted");
+        res.set({ 'Content-Type': 'audio/mpeg' });
+        res.send(audioContent);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
     }
-
-    // Write the binary audio content to a local file
-    fs.writeFile('output.mp3', response.audioContent, 'binary', err => {
-        if (err) {
-            console.error('Error:', err);
-            return;
-        }
-        console.log('Audio content written to file: output.mp3');
-    });
 });
 
-
+/**
+ * Starts the server on the specified port
+ * @param {number} port - Port number to start the server on
+ */
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
