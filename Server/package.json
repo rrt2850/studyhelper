@@ -1,0 +1,25 @@
+{
+  "name": "studyhelperserver",
+  "version": "1.0.0",
+  "description": "The backend for studyhelper, it does API calls and other stuff I haven't thought of yet",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Robert Tetreault",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^4.2.1",
+    "@google-cloud/translate": "^7.2.0",
+    "audiocontext": "^0.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^8.7.0",
+    "googleapis": "^112.0.0",
+    "nodemon": "^2.0.20",
+    "util": "^0.12.5"
+  }
+}
