@@ -15,7 +15,7 @@ import ReactPlayer from 'react-player/youtube';
  * it's formatted like [genre [[url, startTime], [url, startTime], ...]]
  */
 const paths = [
-    /*Subway Surfer*/[['https://www.youtube.com/watch?v=AmUQhXJGk-s', 0]],
+    /*Subway Surfer*/[['https://www.youtube.com/watch?v=AmUQhXJGk-s', 120]],
     /*Kinetic Sand*/[['https://www.youtube.com/watch?v=etp46Aca_UM', 0], ['https://www.youtube.com/watch?v=3clqk2U3T9Y', 13], ['https://www.youtube.com/watch?v=IeOJm025RlE', 6], ['https://www.youtube.com/watch?v=8BYrvVeejzg', 9]],
     /*Soap Cutting*/[['https://www.youtube.com/watch?v=J9dvPQuHz-I', 0], ['https://www.youtube.com/watch?v=2YyXDhE2jJU', 6], ['https://www.youtube.com/watch?v=ORH2XgFFsFY', 0], ['https://www.youtube.com/watch?v=04IQf9Jc5dQ', 0]],
     /*Hydraulic Press*/[['https://www.youtube.com/watch?v=DGxDVLx3Szs', 0], ['https://www.youtube.com/watch?v=JUlL6vqdjms', 0], ['https://www.youtube.com/watch?v=1gGQy4nxyUo', 0], ['https://www.youtube.com/watch?v=eSvhnGdncP8', 0], ['https://www.youtube.com/watch?v=apg7msNcOFw', 0], ['https://www.youtube.com/watch?v=t8_5erSd92Q', 0]],
@@ -86,7 +86,7 @@ class BackgroundPlayer extends Component {
                         },
                     },
                 }}
-                bufferingretry
+                bufferingretry="true"
                 bufferingretrydelay={5000}
             />
         );

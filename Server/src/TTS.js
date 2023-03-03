@@ -28,10 +28,24 @@ const client = new textToSpeech.TextToSpeechClient();
 async function synthesizeText(text) {
     // Format the request json to send to the api
     const request = {
-        input: { text: text },
-        voice: { languageCode: 'en-US', ssmlGender: 'MALE' },
-        audioConfig: { audioEncoding: 'MP3' },
+        "audioConfig": {
+            "audioEncoding": "LINEAR16",
+            "effectsProfileId": [
+                "small-bluetooth-speaker-class-device"
+            ],
+            "pitch": 0,
+            "speakingRate": 1.15
+        },
+        "input": {
+            text: text
+        },
+        "voice": {
+            "languageCode": "en-US",
+            "name": "en-US-Neural2-J"
+        }
     };
+
+    
 
     // Wait until the api finishes
     const [response] = await client.synthesizeSpeech(request);
@@ -53,7 +67,7 @@ app.post('/text-to-speech', async (req, res) => {
         const text = req.body.text;
         const audioContent = await synthesizeText(text);
         console.log("text converted");
-        res.set({ 'Content-Type': 'audio/mpeg' });
+        res.set({ 'Content-Type': 'audio/mp3' });
         res.send(audioContent);
     } catch (err) {
         console.error(err);

@@ -21,10 +21,7 @@ const buttons = [
 ];
 
 const Inputs = ({ handleTyping, changePath, toRead }) => {
-    const [value, setValue] = useState('');
-
-    // When the value of the input field changes, update the state with the new value
-    const handleInput = event => setValue(event.target.value);
+    const [userInput, setUserInput] = useState('');
 
     // When the category button is clicked, get it's index and send it out
     const handleButtonClick = event => {
@@ -33,15 +30,13 @@ const Inputs = ({ handleTyping, changePath, toRead }) => {
     };
 
     // Sends contents of textarea out as toRead when start is pushed
-    const handleStartButtonClick = () => toRead(value);
+    const handleStartButtonClick = () => toRead(userInput);
 
     return (
         <div className='Inputs' onKeyDown={handleTyping}>
-            <textarea
-                value={value}
-                onChange={handleInput}
-                placeholder="Type something here..."
-            />
+            <textarea 
+                onChange={event => setUserInput(event.target.value)}
+                placeholder="Type something here..." />
             <div className='ButtonHolder'>
                 {buttons.map((buttonText, index) => (
                     <button
