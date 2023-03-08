@@ -29,7 +29,7 @@ async function synthesizeText(text) {
     // Format the request json to send to the api
     const request = {
         "audioConfig": {
-            "audioEncoding": "LINEAR16",
+            "audioEncoding": "MP3", // Changed encoding to MP3
             "effectsProfileId": [
                 "small-bluetooth-speaker-class-device"
             ],
@@ -45,11 +45,8 @@ async function synthesizeText(text) {
         }
     };
 
-    
-
     // Wait until the api finishes
     const [response] = await client.synthesizeSpeech(request);
-
     // Return audio data
     return response.audioContent;
 }
@@ -66,8 +63,8 @@ app.post('/text-to-speech', async (req, res) => {
     try {
         const text = req.body.text;
         const audioContent = await synthesizeText(text);
-        console.log("text converted");
-        res.set({ 'Content-Type': 'audio/mp3' });
+        console.log(`converted ${text}`);
+        res.set({ 'Content-Type': 'audio/MP3' }); // Changed content type to audio/wav
         res.send(audioContent);
     } catch (err) {
         console.error(err);

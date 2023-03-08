@@ -1,128 +1,134 @@
 import React, { Component } from 'react';
 
-const audioContext = new AudioContext();
-
-export class Reader extends Component {
+class Reader extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            words: [],
+            audioSentences: [],
+            textSentences: [],
             toRead: props.toRead,
             currentIndex: 0,
         };
-        this.audioBuffer = null;
+        this.audioContext = new AudioContext();
     }
 
+    // This function is called when the component updates due to a change in props or state.
     componentDidUpdate(prevProps) {
-        if (prevProps.toRead !== this.props.toRead || (prevProps.toRead === undefined && this.props.toRead !== undefined)) {
-
+        // Check if the 'toRead' prop has changed or if it is undefined and the new prop is defined.
+        if (
+            prevProps.toRead !== this.props.toRead ||
+            (prevProps.toRead === undefined && this.props.toRead !== undefined)
+        ) {
+            // Replace all occurrences of 'AITA' with 'Am I The Asshole' and 'AH' with 'Asshole'.
             let updatedToRead = this.props.toRead.replace(/AITA/g, 'Am I The Asshole');
-            updatedToRead = updatedToRead.replace(/AH/g, 'Asshole')
-            this.setState({
-                toRead: updatedToRead,
-                currentIndex: 0
-            }, () => {
-                this.generateAudio();
-            });
+            updatedToRead = updatedToRead.replace(/AH/g, 'Asshole');
+
+            // Split the updated text into an array of sentences using regular expressions.
+            const slicedToRead = updatedToRead.split(/(?<=[.?!\n])/)
+                .filter(slice => slice.trim() !== ''); // get rid of any empty slices
+
+            // Set the state of the component with the updated values and generate the audio for the first sentence.
+            this.setState(
+                {
+                    toRead: updatedToRead,
+                    textSentences: slicedToRead,
+                    currentIndex: 0,
+                    audioSentences: [],
+                },
+                () => {
+                    this.generateAudio();
+                }
+            );
         }
     }
 
 
+
+    /**
+     * Generates audio buffers from the text sentences using the text-to-speech API.
+     * Populates the audioSentences state array with the generated audio buffers.
+     * Calls the playAudio function after the audio buffers are generated and the state is set.
+     */
     async generateAudio() {
         console.log('generateAudio called');
-        const { toRead } = this.state;
+
+        // Get the text sentences and initialize an empty array to store the audio buffers.
+        const { textSentences } = this.state;
+        const audioSentences = [];
+
         try {
-            const response = await fetch('http://localhost:5000/text-to-speech', {
-                method: 'POST',
-                body: JSON.stringify({ text: toRead }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            // Loop through each sentence in the text and generate an audio buffer using the text-to-speech API.
+            for (let i = 0; i < textSentences.length; i++) {
+                if (textSentences[i]) {
+                    const response = await fetch('http://localhost:5000/text-to-speech', {
+                        method: 'POST',
+                        body: JSON.stringify({ text: textSentences[i] }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    // Convert the response to an array buffer and decode it into an audio buffer.
+                    const arrayBuffer = await response.arrayBuffer();
+                    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+                    // Push the generated audio buffer to the audioSentences array.
+                    audioSentences.push(audioBuffer);
+                }
+            }
+            // Set the audioSentences state array with the generated audio buffers and call the playAudio function.
+            this.setState({ audioSentences }, () => {
+                this.playAudio();
             });
-            const arrayBuffer = await response.arrayBuffer();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-            console.log("got response");
-            this.audioBuffer = audioBuffer;
-            await this.calculateSegments();
-            this.playNextSegment();
         } catch (error) {
             console.log(error);
         }
     }
 
 
-    async calculateSegments() {
-        return new Promise(resolve => {
-            let words = [];
-            if (typeof this.state.toRead === 'string') {
-                words = this.state.toRead.split(' ');
-            }
-            const segments = [];
-            let offset = 0;
-            words.forEach((word) => {
-                const duration = word.length / 10;
-                const start = offset;
-                const end = start + duration;
-                segments.push({ word, start, end }); // create new object with word property
-                offset = end;
-            });
-            this.setState({ words: segments }, () => {
-                console.log('State updated:', this.state.words);
-                resolve();
-            });
-        });
-    }
 
 
-    playNextSegment() {
-        const { words, currentIndex } = this.state;
-        const currentSegment = words[currentIndex];
-        if (currentSegment) {
-            const { start, end } = currentSegment;
-            const audioSegment = audioContext.createBuffer(
-                1, // number of channels
-                Math.ceil((end - start) * this.audioBuffer.sampleRate), // length of the segment in frames
-                this.audioBuffer.sampleRate // sample rate
-            );
-            const sourceChannel = this.audioBuffer.getChannelData(0);
-            const segmentChannel = new Float32Array(audioSegment.length);
-            const startFrame = Math.floor(start * this.audioBuffer.sampleRate);
-            const endFrame = Math.floor(end * this.audioBuffer.sampleRate);
-            segmentChannel.set(sourceChannel.subarray(startFrame, endFrame));
-            audioSegment.copyToChannel(segmentChannel, 0); // add segmentChannel to audioSegment buffer
-            const source = audioContext.createBufferSource();
-            source.buffer = audioSegment;
-            source.connect(audioContext.destination);
-            source.start(0);
-            source.addEventListener('ended', () => {
+    /**
+    * Plays the audio sentence at the current index in the array of audio buffers.
+    * If there are more audio sentences, updates the current index and recursively
+    * calls itself with the updated index.
+    */
+    playAudio() {
+        // Destructure audioSentences and currentIndex from state
+        const { audioSentences, currentIndex } = this.state;
+
+        // Create a new buffer source node and set its buffer to the current audio sentence
+        const source = this.audioContext.createBufferSource();
+        source.buffer = audioSentences[currentIndex];
+
+        // Connect the source to the audio destination and start playing the audio
+        source.connect(this.audioContext.destination);
+        source.start();
+
+        // When the audio finishes playing, check if there are more sentences to play
+        source.onended = () => {
+            if (currentIndex < audioSentences.length - 1) {
+                // If there are more sentences, update the current index and play the next sentence
                 this.setState({ currentIndex: currentIndex + 1 }, () => {
-                    this.playNextSegment();
+                    this.playAudio();
                 });
-            });
-        } else {
-            // reached the end of the audio
-            this.setState({ currentIndex: 0 });
-        }
+            } else {
+                // If this was the last sentence, log a message
+                console.log('Last sentence played');
+            }
+        };
     }
-
-
-
 
     render() {
-        const { words, currentIndex } = this.state;
-        const currentSegment = words[currentIndex];
+        const { textSentences, currentIndex } = this.state;
+        const currentSentence = textSentences[currentIndex];
+
         return (
-            <>
-                {currentSegment && (
-                    <div>
-                        <h2>Current Segment:</h2>
-                        <p>{currentSegment.word}</p>
-                    </div>
-                )}
-            </>
+            <div className="reader-container">
+                <span className="current-sentence">{currentSentence ? currentSentence.trim() : ''}</span>
+            </div>
         );
     }
-
 }
 
 export default Reader;
